@@ -1,0 +1,15 @@
+# IDE Settings
+.idea/
+*.iml
+.vscode/
+
+# Environment and Sensitive Data
+.env
+*.log
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
+
+# Maven / Build (Yedek koruma)
+**/target/

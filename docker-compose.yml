@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # 1. PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: optivolt-postgres
+    environment:
+      POSTGRES_DB: optivolt_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - optivolt-net
+
+  # 2. Zookeeper for Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: optivolt-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - optivolt-net
+
+  # 3. Apache Kafka Broker
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: optivolt-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - optivolt-net
+
+  # 4. Apache Ignite (In-Memory Data Grid)
+  ignite:
+    image: apacheignite/ignite:2.15.0
+    container_name: optivolt-ignite
+    ports:
+      - "10800:10800"
+      - "47500:47500"
+    networks:
+      - optivolt-net
+
+volumes:
+  postgres_data:
+
+networks:
+  optivolt-net:
+    driver: bridge
