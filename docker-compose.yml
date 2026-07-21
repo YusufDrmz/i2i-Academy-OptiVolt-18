@@ -44,9 +44,12 @@ services:
       - optivolt-net
 
   # 4. Apache Ignite (In-Memory Data Grid)
+  # 4. Apache Ignite (In-Memory Data Grid)
   ignite:
     image: apacheignite/ignite:2.15.0
     container_name: optivolt-ignite
+    environment:
+      - JVM_OPTS=-Djava.util.logging.config.file=config/ignite-log.properties -XX:-UseContainerSupport
     ports:
       - "10800:10800"
       - "47500:47500"
