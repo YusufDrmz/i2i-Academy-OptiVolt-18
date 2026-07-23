@@ -1,0 +1,257 @@
+/* ── Backdrop — HomeDetailModal ile aynı, ayrı yazmaya gerek yok ── */
+/* .modal-backdrop zaten Dashboard'da mevcut, burada override etmiyoruz */
+
+/* ── Panel ─────────────────────────────────────────────────── */
+.addhome-panel {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+}
+
+.addhome-panel::-webkit-scrollbar { width: 6px; }
+.addhome-panel::-webkit-scrollbar-track { background: transparent; }
+.addhome-panel::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+/* ── Header ────────────────────────────────────────────────── */
+.addhome-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.addhome-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.addhome-title-icon { color: #3b82f6; }
+
+.addhome-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+/* close-btn zaten HomeDetailModal.css'te tanımlı, tekrar yazmaya gerek yok */
+/* Ama bu modal bağımsız kullanılabilmesi için burada da tanımlıyoruz */
+.addhome-panel .close-btn {
+  background: #1e293b;
+  border: none;
+  color: #94a3b8;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.addhome-panel .close-btn:hover { background: #334155; color: #f1f5f9; }
+
+/* ── Section ───────────────────────────────────────────────── */
+.addhome-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.addhome-section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #1e293b;
+}
+
+/* ── Field ─────────────────────────────────────────────────── */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 520px) {
+  .field-row { grid-template-columns: 1fr; }
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
+.field-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.required { color: #ef4444; }
+
+.field-input {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #f1f5f9;
+  font-size: 0.88rem;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.field-input::placeholder { color: #475569; }
+.field-input:focus { border-color: #3b82f6; }
+.field-input--error { border-color: #ef4444; }
+.field-input--error:focus { border-color: #ef4444; }
+
+/* number input ok'larını gizle */
+.field-input[type="number"]::-webkit-inner-spin-button,
+.field-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+.field-error {
+  font-size: 0.72rem;
+  color: #f87171;
+}
+
+/* ── Cihaz bölümü ──────────────────────────────────────────── */
+.appliance-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-appliance-btn {
+  background: #1e3a5f;
+  border: 1px solid #2d5a8e;
+  color: #60a5fa;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.15s;
+}
+.add-appliance-btn:hover { background: #1e4a7f; }
+
+.appliance-form-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.appliance-form-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.appliance-form-index {
+  width: 24px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #475569;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.appliance-watt-group { max-width: 130px; flex-shrink: 0; }
+
+.remove-appliance-btn {
+  background: transparent;
+  border: 1px solid #334155;
+  color: #64748b;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.remove-appliance-btn:hover:not(:disabled) {
+  background: #7f1d1d;
+  border-color: #ef4444;
+  color: #f87171;
+}
+.remove-appliance-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ── Submit error ──────────────────────────────────────────── */
+.submit-error {
+  background: #7f1d1d33;
+  border: 1px solid #7f1d1d;
+  border-radius: 8px;
+  color: #f87171;
+  font-size: 0.82rem;
+  padding: 10px 14px;
+}
+
+/* ── Footer ────────────────────────────────────────────────── */
+.addhome-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+  border-top: 1px solid #1e293b;
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  border-radius: 8px;
+  padding: 9px 20px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-cancel:hover { background: #1e293b; color: #f1f5f9; }
+
+.btn-submit {
+  background: #1d4ed8;
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  padding: 9px 24px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-submit:hover:not(:disabled) { background: #2563eb; }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
