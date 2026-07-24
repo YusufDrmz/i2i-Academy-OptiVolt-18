@@ -1,14 +1,18 @@
 package com.i2i.telemetrysensors.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
-public record RegistrationMessage(Long homeId, List<ApplianceDefinition> appliances) {
-
+public record RegistrationMessage(
+        @JsonProperty("id") Long homeId,
+        List<ApplianceDefinition> appliances
+) {
     public record ApplianceDefinition(
-            Long applianceId,
-            String deviceName,
-            String deviceType,
-            double maxSafeWatt
+            @JsonProperty("id") Long applianceId,
+            @JsonProperty("name") String deviceName,
+            @JsonProperty("type") String deviceType,
+            @JsonProperty("safePowerLimit") double maxSafeWatt
     ) {
     }
 }

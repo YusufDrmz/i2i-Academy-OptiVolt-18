@@ -18,13 +18,13 @@ import java.util.concurrent.ThreadLocalRandom;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-
 public class TelemetryPublisher {
+
     private final SimulationRegistry registry;
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
-    @Value("${voltwise.kafka.topic.telemetry:telemetry-stream}")
+    @Value("${voltwise.kafka.topic.telemetry}")
     private String telemetryTopic;
 
     private static final double ANOMALY_CHANCE = 0.05;
@@ -35,7 +35,7 @@ public class TelemetryPublisher {
             for (SimulatedAppliance appliance : home.getAppliances()) {
                 double watt = generateWatt(appliance);
                 TelemetryMessage message = new TelemetryMessage(
-                        home.getHomeId(), appliance.getApplianceId(), watt, Instant.now());
+                        home.getHomeId(), appliance.getApplianceId(), watt, Instant.now().toEpochMilli());
                 publish(message);
             }
         }

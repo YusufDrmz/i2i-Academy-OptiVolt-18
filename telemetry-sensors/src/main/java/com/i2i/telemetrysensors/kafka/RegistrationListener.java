@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-
 public class RegistrationListener {
+
     private final SimulationRegistry registry;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     @KafkaListener(
-            topics = "${voltwise.kafka.topic.registration:home-registration}",
+            topics = "${voltwise.kafka.topic.registration}",
             groupId = "${spring.kafka.consumer.group-id:telemetry-sensors-group}"
     )
     public void onRegistration(String payload) {
