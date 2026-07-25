@@ -15,7 +15,7 @@
 	<description>VoltWise Telemetry Sensors - autonomous IoT appliance simulation engine</description>
 
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 
 	<dependencies>

@@ -1,102 +1,64 @@
 package com.i2i.optivolt.rules;
 
-import com.i2i.optivolt.rules.model.ApplianceState;
-import com.i2i.optivolt.rules.model.HomeState;
-import com.i2i.optivolt.rules.model.TariffState;
-import com.i2i.optivolt.rules.store.HomeStateStore;
+import com.i2i.optivolt.home.dto.ApplianceMetrics;
+import com.i2i.optivolt.home.dto.HomeMetrics;
+import com.i2i.optivolt.home.entity.Appliance;
+import com.i2i.optivolt.home.repository.ApplianceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
-
 public class TariffAndAnomalyService {
+
     private static final int ANOMALY_THRESHOLD_CYCLES = 3;
 
-    private final HomeStateStore homeStateStore;
+    private final ApplianceRepository applianceRepository;
     private final AlertPublisher alertPublisher;
 
-    public void evaluateQuota(Long homeId) {
-        HomeState state = homeStateStore.findByHomeId(homeId)
-                .orElseThrow(() -> new IllegalStateException("Unknown home: " + homeId));
-
-        if (state.getBudgetQuotaTry() <= 0) {
-            log.warn("Home {} has no budget quota configured, skipping evaluation", homeId);
+    public void evaluateApplianceBreach(HomeMetrics metrics, Long applianceId) {
+        ApplianceMetrics appMetrics = metrics.getApplianceMetrics().get(applianceId);
+        if (appMetrics == null) {
+            log.warn("No appliance metrics found for appliance {} on home {}", applianceId, metrics.getHomeId());
             return;
         }
 
-        double percentOfBudget = (state.getTotalCostToday() / state.getBudgetQuotaTry()) * 100.0;
-
-        if (percentOfBudget >= 100.0 && !state.isQuota100Triggered()) {
-            state.setQuota100Triggered(true);
-            state.setTariffState(TariffState.PENALTY);
-            homeStateStore.save(state);
-            log.info("Home {} breached 100% budget quota - penalty tariff activated", homeId);
-            alertPublisher.publish(AlertEvent.builder()
-                    .homeId(homeId)
-                    .type(AlertType.QUOTA_100_PERCENT)
-                    .totalWattToday(state.getTotalWattToday())
-                    .totalCostToday(state.getTotalCostToday())
-                    .budgetQuotaTry(state.getBudgetQuotaTry())
-                    .build());
-        } else if (percentOfBudget >= 80.0 && !state.isQuota80Triggered()) {
-            state.setQuota80Triggered(true);
-            homeStateStore.save(state);
-            log.info("Home {} reached 80% of budget quota", homeId);
-            alertPublisher.publish(AlertEvent.builder()
-                    .homeId(homeId)
-                    .type(AlertType.QUOTA_80_PERCENT)
-                    .totalWattToday(state.getTotalWattToday())
-                    .totalCostToday(state.getTotalCostToday())
-                    .budgetQuotaTry(state.getBudgetQuotaTry())
-                    .build());
-        }
-    }
-
-    public void evaluateApplianceBreach(Long homeId, Long applianceId) {
-        HomeState state = homeStateStore.findByHomeId(homeId)
-                .orElseThrow(() -> new IllegalStateException("Unknown home: " + homeId));
-
-        ApplianceState appliance = state.getApplianceStates().get(applianceId);
-        if (appliance == null) {
-            log.warn("Unknown appliance {} for home {}, skipping anomaly check", applianceId, homeId);
+        Appliance appliance = applianceRepository.findById(applianceId).orElse(null);
+        if (appliance == null || appliance.getSafePowerLimit() == null) {
+            log.warn("No safe power limit configured for appliance {}, skipping anomaly check", applianceId);
             return;
         }
 
-        boolean overLimit = appliance.getLastWatt() > appliance.getMaxSafeWatt();
+        double currentWatt = appMetrics.getCurrentConsumption() != null ? appMetrics.getCurrentConsumption() : 0.0;
+        boolean overLimit = currentWatt > appliance.getSafePowerLimit();
+
+        int breaches = appMetrics.getConsecutiveBreaches() != null ? appMetrics.getConsecutiveBreaches() : 0;
+        boolean wasAnomalous = Boolean.TRUE.equals(appMetrics.getIsAnomalous());
 
         if (overLimit) {
-            appliance.setConsecutiveBreachCount(appliance.getConsecutiveBreachCount() + 1);
+            breaches++;
+            appMetrics.setConsecutiveBreaches(breaches);
 
-            if (appliance.getConsecutiveBreachCount() >= ANOMALY_THRESHOLD_CYCLES && !appliance.isAnomalous()) {
-                appliance.setAnomalous(true);
-                homeStateStore.save(state);
+            if (breaches >= ANOMALY_THRESHOLD_CYCLES && !wasAnomalous) {
+                appMetrics.setIsAnomalous(true);
                 log.info("Appliance {} on home {} marked anomalous after {} consecutive breaches",
-                        applianceId, homeId, appliance.getConsecutiveBreachCount());
+                        applianceId, metrics.getHomeId(), breaches);
                 alertPublisher.publish(AlertEvent.builder()
-                        .homeId(homeId)
+                        .homeId(metrics.getHomeId())
                         .type(AlertType.DEVICE_ANOMALY)
                         .applianceId(applianceId)
-                        .applianceName(appliance.getDeviceName())
-                        .totalWattToday(state.getTotalWattToday())
-                        .totalCostToday(state.getTotalCostToday())
-                        .budgetQuotaTry(state.getBudgetQuotaTry())
+                        .applianceName(appliance.getName())
+                        .totalWattToday(metrics.getCurrentTotalConsumption() != null ? metrics.getCurrentTotalConsumption() : 0.0)
+                        .totalCostToday(metrics.getCurrentBillingTotal() != null ? metrics.getCurrentBillingTotal() : 0.0)
+                        .budgetQuotaTry(0.0)
                         .build());
-                return;
             }
         } else {
-            appliance.setConsecutiveBreachCount(0);
-            appliance.setAnomalous(false);
+            appMetrics.setConsecutiveBreaches(0);
+            appMetrics.setIsAnomalous(false);
         }
-
-        homeStateStore.save(state);
-    }
-
-    public double currentRate(Long homeId) {
-        return homeStateStore.findByHomeId(homeId)
-                .map(s -> s.getTariffState() == TariffState.PENALTY ? s.getPenaltyRate() : s.getStandardRate())
-                .orElse(0.0);
     }
 }
