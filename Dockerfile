@@ -17,10 +17,11 @@ COPY --from=build /app/target/optivolt-core-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 
-# Java 21 & Apache Ignite uyumlu modül parametreleri
+# Apache Ignite 2.15+ & Java 17/21 Resmi JVM Bayrakları
 ENTRYPOINT ["java", \
   "--add-opens=java.base/java.lang=ALL-UNNAMED", \
   "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED", \
+  "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED", \
   "--add-opens=java.base/java.math=ALL-UNNAMED", \
   "--add-opens=java.base/java.nio=ALL-UNNAMED", \
   "--add-opens=java.base/java.util=ALL-UNNAMED", \
@@ -29,9 +30,10 @@ ENTRYPOINT ["java", \
   "--add-opens=java.base/java.util.concurrent.locks=ALL-UNNAMED", \
   "--add-opens=java.base/jdk.internal.access=ALL-UNNAMED", \
   "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED", \
+  "--add-opens=java.base/jdk.internal.loader=ALL-UNNAMED", \
   "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED", \
-  "--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED", \
   "--add-opens=java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED", \
+  "--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED", \
   "--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED", \
   "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED", \
   "-jar", "app.jar"]
