@@ -17,7 +17,7 @@ COPY --from=build /app/target/optivolt-core-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 
-# Apache Ignite & Java 21 tam uyumlu, doğrulandmış JVM bayrakları
+# Java 21 & Apache Ignite uyumlu modül parametreleri
 ENTRYPOINT ["java", \
   "--add-opens=java.base/java.lang=ALL-UNNAMED", \
   "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED", \
@@ -30,7 +30,7 @@ ENTRYPOINT ["java", \
   "--add-opens=java.base/jdk.internal.access=ALL-UNNAMED", \
   "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED", \
   "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED", \
-  "--add-opens=java.management/com.sun.management.internal=ALL-UNNAMED", \
+  "--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED", \
   "--add-opens=java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED", \
   "--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED", \
   "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED", \
