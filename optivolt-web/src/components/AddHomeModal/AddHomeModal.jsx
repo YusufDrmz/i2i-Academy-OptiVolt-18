@@ -55,29 +55,30 @@ const AddHomeModal = ({ onClose, onSuccess }) => {
   };
 
   // ── Gönder ───────────────────────────────────────────────────
-  const handleSubmit = async () => {
-    const e = validate();
-    if (Object.keys(e).length > 0) { setErrors(e); return; }
+const handleSubmit = async () => {
+  const e = validate();
+  if (Object.keys(e).length > 0) { setErrors(e); return; }
 
-    setSubmitting(true);
-    try {
-      await addHome({
-        ...form,
-        budgetQuotaTry: Number(form.budgetQuotaTry),
-        powerQuotaWatt: Number(form.powerQuotaWatt),
-        appliances: appliances.map(a => ({
-          name: a.name.trim(),
-          wattLimit: Number(a.wattLimit),
-        })),
-      });
-      onSuccess();
-      onClose();
-    } catch (err) {
-      setErrors({ submit: 'Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.' });
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  setSubmitting(true);
+  try {
+    await addHome({
+  ...form,
+  budgetQuotaTry: Number(form.budgetQuotaTry),
+  powerQuotaWatt: Number(form.powerQuotaWatt),
+  appliances: appliances.map(a => ({
+    name: a.name.trim(),
+    wattLimit: Number(a.wattLimit),
+  })),
+});
+alert('Konut başarıyla eklendi!');
+onSuccess();
+onClose();
+  } catch {
+    setErrors({ submit: 'Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.' });
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   // ESC ile kapat
   React.useEffect(() => {

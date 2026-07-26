@@ -1,7 +1,10 @@
 import axios from 'axios';
-
 const API_BASE_URL = 'http://localhost:8080/api';
 
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 2000,
+});
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
 export const mockHomes = [
@@ -43,26 +46,25 @@ export const mockHomes = [
   }
 ];
 
-const mockAppliancesByHomeId = {
+export const mockAppliancesByHomeId = {
   1: [
-    { id: 101, name: "Buzdolabı",          currentWatt: 142,  maxSafeWatt: 150, isAnomalous: false, consecutiveBreaches: 0 },
-    { id: 102, name: "Klima",              currentWatt: 2800, maxSafeWatt: 2000, isAnomalous: true,  consecutiveBreaches: 3 },
-    { id: 103, name: "Çamaşır Makinesi",  currentWatt: 1258, maxSafeWatt: 2500, isAnomalous: false, consecutiveBreaches: 1 },
+    { id: 101, name: "Buzdolabı",         currentWatt: 142,  maxSafeWatt: 150,  isAnomalous: false, consecutiveBreaches: 0 },
+    { id: 102, name: "Klima",             currentWatt: 2800, maxSafeWatt: 2000, isAnomalous: true,  consecutiveBreaches: 3 },
+    { id: 103, name: "Çamaşır Makinesi", currentWatt: 1258, maxSafeWatt: 2500, isAnomalous: false, consecutiveBreaches: 1 },
   ],
   2: [
-    { id: 201, name: "Buzdolabı",          currentWatt: 160,  maxSafeWatt: 150, isAnomalous: true,  consecutiveBreaches: 3 },
+    { id: 201, name: "Buzdolabı",          currentWatt: 160,  maxSafeWatt: 150,  isAnomalous: true,  consecutiveBreaches: 3 },
     { id: 202, name: "Klima (Salon)",      currentWatt: 2100, maxSafeWatt: 2000, isAnomalous: true,  consecutiveBreaches: 4 },
     { id: 203, name: "Klima (Yatak Oda)", currentWatt: 1950, maxSafeWatt: 2000, isAnomalous: false, consecutiveBreaches: 0 },
     { id: 204, name: "Fırın",             currentWatt: 1100, maxSafeWatt: 2200, isAnomalous: false, consecutiveBreaches: 0 },
-    { id: 205, name: "Çamaşır Makinesi",  currentWatt: 490,  maxSafeWatt: 2500, isAnomalous: false, consecutiveBreaches: 0 },
+    { id: 205, name: "Çamaşır Makinesi", currentWatt: 490,  maxSafeWatt: 2500, isAnomalous: false, consecutiveBreaches: 0 },
   ],
   3: [
-    { id: 301, name: "Buzdolabı",          currentWatt: 130,  maxSafeWatt: 150, isAnomalous: false, consecutiveBreaches: 0 },
-    { id: 302, name: "TV + Ses Sistemi",   currentWatt: 220,  maxSafeWatt: 400, isAnomalous: false, consecutiveBreaches: 0 },
+    { id: 301, name: "Buzdolabı",        currentWatt: 130, maxSafeWatt: 150, isAnomalous: false, consecutiveBreaches: 0 },
+    { id: 302, name: "TV + Ses Sistemi", currentWatt: 220, maxSafeWatt: 400, isAnomalous: false, consecutiveBreaches: 0 },
   ],
 };
 
-// Grafik için günlük tüketim mock datası
 const mockHistoryByHomeId = {
   1: [
     { date: "17 Tem", totalKwh: 18.2, totalCost: 39.1 },
@@ -93,48 +95,78 @@ const mockHistoryByHomeId = {
   ],
 };
 
-// ─── API Fonksiyonları ────────────────────────────────────────────────────────
+const mockApplianceHistory = {
+  101: [ { date: "17 Tem", avgWatt: 138 }, { date: "18 Tem", avgWatt: 141 }, { date: "19 Tem", avgWatt: 135 }, { date: "20 Tem", avgWatt: 143 }, { date: "21 Tem", avgWatt: 139 }, { date: "22 Tem", avgWatt: 142 }, { date: "23 Tem", avgWatt: 142 } ],
+  102: [ { date: "17 Tem", avgWatt: 1850 }, { date: "18 Tem", avgWatt: 2100 }, { date: "19 Tem", avgWatt: 2400 }, { date: "20 Tem", avgWatt: 2650 }, { date: "21 Tem", avgWatt: 2750 }, { date: "22 Tem", avgWatt: 2800 }, { date: "23 Tem", avgWatt: 2800 } ],
+  103: [ { date: "17 Tem", avgWatt: 900 }, { date: "18 Tem", avgWatt: 0 }, { date: "19 Tem", avgWatt: 1100 }, { date: "20 Tem", avgWatt: 0 }, { date: "21 Tem", avgWatt: 1258 }, { date: "22 Tem", avgWatt: 950 }, { date: "23 Tem", avgWatt: 1258 } ],
+  201: [ { date: "17 Tem", avgWatt: 148 }, { date: "18 Tem", avgWatt: 155 }, { date: "19 Tem", avgWatt: 158 }, { date: "20 Tem", avgWatt: 160 }, { date: "21 Tem", avgWatt: 162 }, { date: "22 Tem", avgWatt: 160 }, { date: "23 Tem", avgWatt: 160 } ],
+  202: [ { date: "17 Tem", avgWatt: 1800 }, { date: "18 Tem", avgWatt: 1950 }, { date: "19 Tem", avgWatt: 2000 }, { date: "20 Tem", avgWatt: 2050 }, { date: "21 Tem", avgWatt: 2080 }, { date: "22 Tem", avgWatt: 2100 }, { date: "23 Tem", avgWatt: 2100 } ],
+  203: [ { date: "17 Tem", avgWatt: 1700 }, { date: "18 Tem", avgWatt: 1800 }, { date: "19 Tem", avgWatt: 1850 }, { date: "20 Tem", avgWatt: 1900 }, { date: "21 Tem", avgWatt: 1920 }, { date: "22 Tem", avgWatt: 1940 }, { date: "23 Tem", avgWatt: 1950 } ],
+  301: [ { date: "17 Tem", avgWatt: 125 }, { date: "18 Tem", avgWatt: 128 }, { date: "19 Tem", avgWatt: 130 }, { date: "20 Tem", avgWatt: 127 }, { date: "21 Tem", avgWatt: 129 }, { date: "22 Tem", avgWatt: 131 }, { date: "23 Tem", avgWatt: 130 } ],
+  302: [ { date: "17 Tem", avgWatt: 180 }, { date: "18 Tem", avgWatt: 210 }, { date: "19 Tem", avgWatt: 195 }, { date: "20 Tem", avgWatt: 220 }, { date: "21 Tem", avgWatt: 215 }, { date: "22 Tem", avgWatt: 218 }, { date: "23 Tem", avgWatt: 220 } ],
+};
+
+const mockNotificationsByHomeId = {
+  1: [
+    { id: 1, type: "QUOTA_80", sentAt: "2026-07-23T18:42:00", emailSent: true, content: "Sayın kullanıcı, Daire 12 konutunuzda aylık bütçenizin %80'ine ulaşıldı. Mevcut tüketim hızınızda devam edilmesi halinde ay sonundan önce bütçenizi aşmanız beklenmektedir. Özellikle akşam saatlerinde klima kullanımınızı azaltmanızı öneririz." },
+    { id: 2, type: "ANOMALY_DETECTED", sentAt: "2026-07-22T14:15:00", emailSent: true, content: "Daire 12 konutunuzdaki Klima cihazı art arda 3 ölçüm döngüsünde güvenli güç limitinin üzerinde çalışmaktadır. Cihazınızı kontrol etmenizi ve gerekirse teknik servis çağırmanızı öneririz." },
+  ],
+  2: [
+    { id: 3, type: "QUOTA_100", sentAt: "2026-07-23T20:10:00", emailSent: true, content: "Villa 4 konutunuz aylık bütçe kotasını aşmıştır. Bu andan itibaren tüketim cezalı tarife üzerinden hesaplanacaktır. Gereksiz cihazları kapatarak ek maliyeti minimize edebilirsiniz." },
+    { id: 4, type: "ANOMALY_DETECTED", sentAt: "2026-07-23T19:55:00", emailSent: true, content: "Villa 4 konutunuzdaki Buzdolabı ve Klima (Salon) cihazları anormal güç tüketimi göstermektedir. Lütfen kontrol edin." },
+    { id: 5, type: "QUOTA_80", sentAt: "2026-07-22T16:30:00", emailSent: true, content: "Villa 4 konutunuz aylık bütçesinin %80'ine ulaşmıştır. Tüketimi azaltmazsanız kota aşımı gerçekleşecektir." },
+  ],
+  3: [],
+};
+
+// ─── API Fonksiyonları ─────────────────────────────────────────────────────────
 
 export const fetchHomes = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/homes`);
+    const response = await api.get('/homes');
     return response.data;
   } catch {
-    console.warn('Backend henüz yayında değil, mock ev listesi yükleniyor...');
     return mockHomes;
   }
 };
-
 export const fetchHomeDetail = async (homeId) => {
   try {
     const [homeRes, historyRes] = await Promise.all([
-      axios.get(`${API_BASE_URL}/homes/${homeId}`),
-      axios.get(`${API_BASE_URL}/homes/${homeId}/history`),
+      api.get(`/homes/${homeId}`),
+      api.get(`/homes/${homeId}/history`),
     ]);
-    return {
-      home: homeRes.data,
-      history: historyRes.data,
-    };
+    return { home: homeRes.data, history: historyRes.data };
   } catch {
-    console.warn(`Backend hazır değil, homeId=${homeId} için mock detay yükleniyor...`);
     const baseHome = mockHomes.find(h => h.id === homeId);
     return {
-      home: {
-        ...baseHome,
-        appliances: mockAppliancesByHomeId[homeId] || [],
-      },
+      home: { ...baseHome, appliances: mockAppliancesByHomeId[homeId] || [] },
       history: mockHistoryByHomeId[homeId] || [],
     };
   }
 };
 
+export const fetchApplianceDetail = async (applianceId) => {
+  try {
+    const response = await api.get(`/appliances/${applianceId}/history`);
+    return { history: response.data };
+  } catch {
+    return { history: mockApplianceHistory[applianceId] || [] };
+  }
+};
+
+export const fetchHomeNotifications = async (homeId) => {
+  try {
+    const response = await api.get(`/homes/${homeId}/notifications`);
+    return response.data;
+  } catch {
+    return mockNotificationsByHomeId[homeId] || [];
+  }
+};
 export const addHome = async (homeData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/homes`, homeData);
+    const response = await api.post('/homes', homeData);
     return response.data;
-  } catch (err) {
-    // Backend hazır değilse mock olarak listeye ekle
-    console.warn('Backend hazır değil, mock ekleme simüle ediliyor...');
+  } catch {
     const newHome = {
       id: Date.now(),
       ...homeData,
@@ -145,5 +177,23 @@ export const addHome = async (homeData) => {
     };
     mockHomes.push(newHome);
     return newHome;
+  }
+};
+
+export const addAppliance = async (homeId, applianceData) => {
+  try {
+    const response = await api.post(`/homes/${homeId}/appliances`, applianceData);
+    return response.data;
+  } catch {
+    const newAppliance = {
+      id: Date.now(),
+      ...applianceData,
+      currentWatt: 0,
+      isAnomalous: false,
+      consecutiveBreaches: 0,
+    };
+    const list = mockAppliancesByHomeId[homeId];
+    if (list) list.push(newAppliance);
+    return newAppliance;
   }
 };
