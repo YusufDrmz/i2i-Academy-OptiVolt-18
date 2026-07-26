@@ -1,0 +1,52 @@
+.placeholder-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  max-width: 340px;
+}
+
+.placeholder-icon-wrap {
+  width: 80px;
+  height: 80px;
+  background: #eef2ff;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-icon { color: #6366f1; }
+
+.placeholder-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.placeholder-desc {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.placeholder-badge {
+  background: #eef2ff;
+  color: #6366f1;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
