@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgrespassword
     ports:
-      - "5432:5432"
+      - "5436:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -44,7 +44,6 @@ services:
       - optivolt-net
 
   # 4. Apache Ignite (In-Memory Data Grid)
-  # 4. Apache Ignite (In-Memory Data Grid)
   ignite:
     image: apacheignite/ignite:2.15.0
     container_name: optivolt-ignite
@@ -53,6 +52,7 @@ services:
     ports:
       - "10800:10800"
       - "47500:47500"
+      - "47100:47100"
     networks:
       - optivolt-net
 

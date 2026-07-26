@@ -13,3 +13,5 @@ Thumbs.db
 
 # Maven / Build (Yedek koruma)
 **/target/
+
+echo "optivolt-core/ignite/" >> .gitignore

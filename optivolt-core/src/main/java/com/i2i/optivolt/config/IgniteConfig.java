@@ -28,7 +28,7 @@ public class IgniteConfig {
     public Ignite igniteInstance() {
         IgniteConfiguration cfg = new IgniteConfiguration();
         cfg.setClientMode(clientMode);
-        cfg.setPeerClassLoadingEnabled(true);
+        cfg.setPeerClassLoadingEnabled(false);
 
         TcpDiscoverySpi spi = new TcpDiscoverySpi();
         TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
