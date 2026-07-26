@@ -2,9 +2,11 @@ spring:
   application:
     name: optivolt-core
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5436/optivolt_db}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgrespassword}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/optivolt}
+    username: ${SPRING_DATASOURCE_USERNAME:admin}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
