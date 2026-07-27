@@ -1,10 +1,19 @@
 import axios from 'axios';
-const API_BASE_URL = 'https://statewide-std-coordinator-hayes.trycloudflare.com/api';
+
+// Canlı Render Backend Adresi
+const API_BASE_URL = 'https://i2i-academy-optivolt-18.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 2000,
+  timeout: 10000, // Render cold start ve Kafka gecikmelerine karşı 10 saniyeye çıkarıldı
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
+
+export default api;
+
+// ─── Mock Data ────────────────────────────────────────────────────────────────
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
 export const mockHomes = [
