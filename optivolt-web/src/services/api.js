@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_BASE_URL = 'https://privileges-polymer-genius-petersburg.trycloudflare.com/api';
+const API_BASE_URL = 'https://i2i-academy-optivolt-18.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
