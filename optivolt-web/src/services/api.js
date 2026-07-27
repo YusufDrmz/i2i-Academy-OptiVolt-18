@@ -1,11 +1,10 @@
 import axios from 'axios';
 
-// Canlı Render Backend Adresi
 const API_BASE_URL = 'https://i2i-academy-optivolt-18.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000, // Render cold start ve Kafka gecikmelerine karşı 10 saniyeye çıkarıldı
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -13,7 +12,6 @@ const api = axios.create({
 
 export default api;
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
 export const mockHomes = [
@@ -128,81 +126,62 @@ const mockNotificationsByHomeId = {
   3: [],
 };
 
-// ─── API Fonksiyonları ─────────────────────────────────────────────────────────
+// ─── API Fonksiyonları (DOĞRUDAN MOCK MODU) ────────────────────────────────────
 
 export const fetchHomes = async () => {
-  try {
-    const response = await api.get('/homes');
-    return response.data;
-  } catch {
-    return mockHomes;
-  }
+  return mockHomes;
 };
+
 export const fetchHomeDetail = async (homeId) => {
-  try {
-    const [homeRes, historyRes] = await Promise.all([
-      api.get(`/homes/${homeId}`),
-      api.get(`/homes/${homeId}/history`),
-    ]);
-    return { home: homeRes.data, history: historyRes.data };
-  } catch {
-    const baseHome = mockHomes.find(h => h.id === homeId);
-    return {
-      home: { ...baseHome, appliances: mockAppliancesByHomeId[homeId] || [] },
-      history: mockHistoryByHomeId[homeId] || [],
-    };
-  }
+  const numericId = Number(homeId);
+  const baseHome = mockHomes.find(h => h.id === numericId) || mockHomes[0];
+  return {
+    home: { ...baseHome, appliances: mockAppliancesByHomeId[baseHome.id] || [] },
+    history: mockHistoryByHomeId[baseHome.id] || [],
+  };
 };
 
 export const fetchApplianceDetail = async (applianceId) => {
-  try {
-    const response = await api.get(`/appliances/${applianceId}/history`);
-    return { history: response.data };
-  } catch {
-    return { history: mockApplianceHistory[applianceId] || [] };
-  }
+  const numericId = Number(applianceId);
+  return { history: mockApplianceHistory[numericId] || mockApplianceHistory[101] };
 };
 
 export const fetchHomeNotifications = async (homeId) => {
-  try {
-    const response = await api.get(`/homes/${homeId}/notifications`);
-    return response.data;
-  } catch {
-    return mockNotificationsByHomeId[homeId] || [];
-  }
+  const numericId = Number(homeId);
+  return mockNotificationsByHomeId[numericId] || [];
 };
+
 export const addHome = async (homeData) => {
-  try {
-    const response = await api.post('/homes', homeData);
-    return response.data;
-  } catch {
-    const newHome = {
-      id: Date.now(),
-      ...homeData,
-      currentWatt: 0,
-      currentCostTry: 0,
-      status: 'NORMAL',
-      appliancesCount: homeData.appliances?.length ?? 0,
-    };
-    mockHomes.push(newHome);
-    return newHome;
-  }
+  const newHome = {
+    id: Date.now(),
+    name: homeData.name || "Yeni Ev",
+    address: homeData.address || "İzmir",
+    contactEmail: homeData.contactEmail || "demo@example.com",
+    currentWatt: 1450,
+    powerQuotaWatt: homeData.powerQuotaWatt || 5000,
+    budgetQuotaTry: homeData.budgetQuotaTry || 1500,
+    currentCostTry: 320,
+    status: 'NORMAL',
+    appliancesCount: homeData.appliances?.length ?? 1,
+  };
+  mockHomes.push(newHome);
+  return newHome;
 };
 
 export const addAppliance = async (homeId, applianceData) => {
-  try {
-    const response = await api.post(`/homes/${homeId}/appliances`, applianceData);
-    return response.data;
-  } catch {
-    const newAppliance = {
-      id: Date.now(),
-      ...applianceData,
-      currentWatt: 0,
-      isAnomalous: false,
-      consecutiveBreaches: 0,
-    };
-    const list = mockAppliancesByHomeId[homeId];
-    if (list) list.push(newAppliance);
-    return newAppliance;
+  const numericId = Number(homeId);
+  const newAppliance = {
+    id: Date.now(),
+    name: applianceData.name || "Yeni Cihaz",
+    currentWatt: 350,
+    maxSafeWatt: applianceData.maxSafeWatt || 1500,
+    isAnomalous: false,
+    consecutiveBreaches: 0,
+  };
+  
+  if (!mockAppliancesByHomeId[numericId]) {
+    mockAppliancesByHomeId[numericId] = [];
   }
+  mockAppliancesByHomeId[numericId].push(newAppliance);
+  return newAppliance;
 };
